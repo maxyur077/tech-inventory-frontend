@@ -76,7 +76,6 @@ https://github.com/user-attachments/assets/0d6a27b4-756d-433b-bba3-c095f83c1d63
 git clone https://github.com/yourusername/tech-inventory
 cd tech-inventory
 
-text
 
 #### 2. Install Frontend Dependencies
 
