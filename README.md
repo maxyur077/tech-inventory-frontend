@@ -2,7 +2,7 @@
 
 A modern, full-featured inventory management system built with Angular 17+ and Node.js, designed specifically for tech products with beautiful UI and comprehensive functionality.
 
-https://screenapp.io/app/#/shared/penLPdW2s3
+[![Watch the video](https://i.sstatic.net/Vp2cE.png)](https://screenapp.io/app/#/shared/penLPdW2s3)
 
 ## 🚀 Features Overview
 
