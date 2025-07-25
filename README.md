@@ -2,7 +2,7 @@
 
 A modern, full-featured inventory management system built with Angular 17+ and Node.js, designed specifically for tech products with beautiful UI and comprehensive functionality.
 
-![Tech Inventory](https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=400&fit=crop&auto=format)
+<img width="1589" height="814" alt="image" src="https://github.com/user-attachments/assets/9a8429d3-6d77-41ea-8ced-e60740d4179d" />
 
 ## 🚀 Features Overview
 
@@ -61,8 +61,7 @@ A modern, full-featured inventory management system built with Angular 17+ and N
 
 - Node.js (v18+)
 - Angular CLI (v17+)
-- PostgreSQL or SQLite
-- Unsplash API Key (optional)
+-  SQL
 
 ### Installation
 
