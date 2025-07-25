@@ -1,0 +1,232 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Products</h1>
+      <p class="mt-2 text-gray-600">Manage your tech gadget inventory</p>
+    </div>
+    <a
+      *ngIf="isAdmin"
+      routerLink="/products/new"
+      class="btn-primary flex items-center space-x-2"
+    >
+      <svg
+        class="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+        ></path>
+      </svg>
+      <span>Add Product</span>
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="card mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >Search</label
+        >
+        <input
+          type="text"
+          [(ngModel)]="filters.search"
+          (input)="onFilterChange()"
+          placeholder="Search products..."
+          class="input-field"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >Category</label
+        >
+        <select
+          [(ngModel)]="filters.category"
+          (change)="onFilterChange()"
+          class="input-field"
+        >
+          <option value="">All Categories</option>
+          <option value="smartphones">Smartphones</option>
+          <option value="laptops">Laptops</option>
+          <option value="tablets">Tablets</option>
+          <option value="accessories">Accessories</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >Min Price</label
+        >
+        <input
+          type="number"
+          [(ngModel)]="filters.minPrice"
+          (input)="onFilterChange()"
+          placeholder="0"
+          class="input-field"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >Max Price</label
+        >
+        <input
+          type="number"
+          [(ngModel)]="filters.maxPrice"
+          (input)="onFilterChange()"
+          placeholder="10000"
+          class="input-field"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-12">
+    <div
+      class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"
+    ></div>
+    <p class="mt-2 text-gray-600">Loading products...</p>
+  </div>
+
+  <!-- Products Grid -->
+  <div
+    *ngIf="!isLoading"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+  >
+    <div
+      *ngFor="let product of products"
+      class="card hover:shadow-lg transition-shadow"
+    >
+      <div class="aspect-w-16 aspect-h-9 mb-4">
+        <div
+          class="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center"
+        >
+          <svg
+            class="w-12 h-12 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+            ></path>
+          </svg>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-start mb-2">
+          <h3 class="text-lg font-semibold text-gray-900 truncate">
+            {{ product.name }}
+          </h3>
+          <span class="text-lg font-bold text-primary-600"
+            >${{ product.price }}</span
+          >
+        </div>
+
+        <p class="text-gray-600 text-sm mb-3 line-clamp-2">
+          {{ product.description || "No description available" }}
+        </p>
+
+        <div class="flex items-center justify-between mb-4">
+          <span
+            class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full"
+          >
+            {{ product.category || "Uncategorized" }}
+          </span>
+          <span class="text-sm text-gray-600">
+            Stock: {{ product.stock_quantity }}
+          </span>
+        </div>
+
+        <div class="flex space-x-2">
+          <button
+            (click)="viewProduct(product.id)"
+            class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+          >
+            View
+          </button>
+          <button
+            *ngIf="isAdmin"
+            (click)="editProduct(product.id)"
+            class="flex-1 btn-primary text-sm py-2"
+          >
+            Edit
+          </button>
+          <button
+            *ngIf="isAdmin"
+            (click)="deleteProduct(product)"
+            class="bg-red-100 hover:bg-red-200 text-red-800 py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && products.length === 0" class="text-center py-12">
+    <svg
+      class="mx-auto h-12 w-12 text-gray-400"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+      ></path>
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">No products found</h3>
+    <p class="mt-1 text-sm text-gray-500">
+      Get started by creating a new product.
+    </p>
+    <div class="mt-6">
+      <a *ngIf="isAdmin" routerLink="/products/new" class="btn-primary">
+        Add Product
+      </a>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div
+    *ngIf="!isLoading && products.length > 0"
+    class="mt-8 flex items-center justify-between"
+  >
+    <div class="text-sm text-gray-700">
+      Showing {{ (pagination.page - 1) * pagination.limit + 1 }} to
+      {{ Math.min(pagination.page * pagination.limit, pagination.total) }} of
+      {{ pagination.total }} results
+    </div>
+    <div class="flex space-x-2">
+      <button
+        [disabled]="pagination.page <= 1"
+        (click)="changePage(pagination.page - 1)"
+        class="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+      >
+        Previous
+      </button>
+      <span class="px-3 py-2 bg-primary-100 text-primary-700 rounded-lg">
+        {{ pagination.page }}
+      </span>
+      <button
+        [disabled]="pagination.page >= pagination.pages"
+        (click)="changePage(pagination.page + 1)"
+        class="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</div>

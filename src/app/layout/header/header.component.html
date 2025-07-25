@@ -1,0 +1,132 @@
+<header *ngIf="isVisible" class="bg-white shadow-lg border-b sticky top-0 z-50">
+  <!-- Rest of your header content stays the same -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo -->
+      <div class="flex items-center">
+        <a routerLink="/dashboard" class="flex items-center space-x-3 group">
+          <div
+            class="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-all duration-200"
+          >
+            <span class="text-white font-bold text-lg">TI</span>
+          </div>
+          <span
+            class="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
+          >
+            Tech Inventory
+          </span>
+        </a>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="hidden md:flex space-x-1">
+        <a
+          routerLink="/dashboard"
+          routerLinkActive="bg-blue-50 text-blue-600 border-blue-200"
+          class="nav-link"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+            ></path>
+          </svg>
+          Dashboard
+        </a>
+        <a
+          routerLink="/products"
+          routerLinkActive="bg-blue-50 text-blue-600 border-blue-200"
+          class="nav-link"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+            ></path>
+          </svg>
+          Products
+        </a>
+      </nav>
+
+      <!-- User Menu -->
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <button
+            class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+            (click)="logout()"
+          >
+            <div
+              class="w-8 h-8 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full flex items-center justify-center"
+            >
+              <span class="text-sm font-medium text-white">{{
+                getUserInitials()
+              }}</span>
+            </div>
+            <span class="hidden md:block text-sm font-medium text-gray-700">{{
+              currentUser.username
+            }}</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-4 h-4 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden p-2" (click)="toggleMobileMenu()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div *ngIf="mobileMenuOpen" class="md:hidden border-t bg-white">
+      <nav class="px-2 pt-2 pb-3 space-y-1">
+        <a routerLink="/dashboard" class="mobile-nav-link">Dashboard</a>
+        <a routerLink="/products" class="mobile-nav-link">Products</a>
+        <button (click)="logout()" class="mobile-nav-link w-full text-left">
+          Logout
+        </button>
+      </nav>
+    </div>
+  </div>
+</header>

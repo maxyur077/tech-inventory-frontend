@@ -1,0 +1,201 @@
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-12">
+    <div
+      class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"
+    ></div>
+    <p class="mt-2 text-gray-600">Loading product...</p>
+  </div>
+
+  <!-- Product Detail -->
+  <div *ngIf="!isLoading && product" class="space-y-8">
+    <!-- Header -->
+    <div>
+      <button
+        (click)="goBack()"
+        class="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+      >
+        <svg
+          class="w-5 h-5 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          ></path>
+        </svg>
+        Back to Products
+      </button>
+    </div>
+
+    <!-- Product Info -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Product Image -->
+      <div class="aspect-w-1 aspect-h-1">
+        <div
+          class="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center product-image"
+        >
+          <svg
+            class="w-24 h-24 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+            ></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Product Details -->
+      <div class="space-y-6">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">{{ product.name }}</h1>
+          <div class="mt-2 flex items-center space-x-4">
+            <span class="text-3xl font-bold text-primary-600 price-tag"
+              >${{ product.price }}</span
+            >
+            <span
+              class="px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full category-badge"
+            >
+              {{ product.category || "Uncategorized" }}
+            </span>
+          </div>
+        </div>
+
+        <div class="border-t pt-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Description</h3>
+          <p class="text-gray-600">
+            {{ product.description || "No description available" }}
+          </p>
+        </div>
+
+        <div class="border-t pt-6">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="info-card">
+              <h4 class="text-sm font-medium text-gray-500">Stock Quantity</h4>
+              <p class="text-lg font-semibold text-gray-900">
+                {{ product.stock_quantity }}
+              </p>
+            </div>
+            <div class="info-card">
+              <h4 class="text-sm font-medium text-gray-500">Status</h4>
+              <span
+                class="inline-flex px-2 py-1 text-xs font-semibold rounded-full status-badge"
+                [ngClass]="
+                  product.stock_quantity > 0
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                "
+              >
+                {{ product.stock_quantity > 0 ? "In Stock" : "Out of Stock" }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="border-t pt-6 space-y-4">
+          <button
+            *ngIf="product.stock_quantity > 0"
+            (click)="addToCart()"
+            [disabled]="isAddingToCart"
+            class="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed add-to-cart-btn"
+          >
+            <span
+              *ngIf="isAddingToCart"
+              class="animate-spin -ml-1 mr-2 h-4 w-4"
+            >
+              <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            </span>
+            {{ isAddingToCart ? "Adding to Cart..." : "Add to Cart" }}
+          </button>
+
+          <button
+            *ngIf="product.stock_quantity === 0"
+            disabled
+            class="w-full bg-gray-300 text-gray-500 py-2 px-4 rounded-lg cursor-not-allowed out-of-stock-btn"
+          >
+            Out of Stock
+          </button>
+
+          <div *ngIf="isAdmin" class="flex space-x-2">
+            <button
+              (click)="editProduct()"
+              class="flex-1 btn-secondary admin-btn"
+            >
+              Edit Product
+            </button>
+            <button
+              (click)="deleteProduct()"
+              class="flex-1 btn-danger admin-btn"
+            >
+              Delete Product
+            </button>
+          </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div
+          *ngIf="successMessage"
+          class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded message-box success-message"
+        >
+          {{ successMessage }}
+        </div>
+
+        <div
+          *ngIf="errorMessage"
+          class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded message-box error-message"
+        >
+          {{ errorMessage }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && !product" class="text-center py-12 error-state">
+    <svg
+      class="mx-auto h-12 w-12 text-gray-400"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+      ></path>
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">Product not found</h3>
+    <p class="mt-1 text-sm text-gray-500">
+      The product you're looking for doesn't exist.
+    </p>
+    <div class="mt-6">
+      <button (click)="goBack()" class="btn-primary">Back to Products</button>
+    </div>
+  </div>
+</div>
