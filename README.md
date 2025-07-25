@@ -1,59 +1,80 @@
-# TechInventoryFrontend
+# 📱 Tech Inventory Management System
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.3.
+A modern, full-featured inventory management system built with Angular 17+ and Node.js, designed specifically for tech products with beautiful UI and comprehensive functionality.
 
-## Development server
+![Tech Inventory](https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=400&fit=crop&auto=format)
 
-To start a local development server, run:
+## 🚀 Features Overview
 
-```bash
-ng serve
-```
+### 🔐 **Authentication System**
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **JWT-based Authentication** with secure token management
+- **Protected Routes** with authentication guards
+- **Auto-logout** on token expiration
+- **Login/Register** with form validation
+- **Profile Management** with update capabilities
 
-## Code scaffolding
+### 📦 **Product Management**
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- **CRUD Operations** - Create, Read, Update, Delete products
+- **Advanced Search & Filtering** by name, category, price range
+- **Dynamic Image Integration** using Unsplash API
+- **Category Management** with icons (📱 Smartphones, 💻 Laptops, etc.)
+- **Stock Management** with real-time stock status
+- **Product Gallery** with multiple image support
+- **Responsive Product Cards** with hover effects
 
-```bash
-ng generate component component-name
-```
+### 🎨 **Modern UI/UX**
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- **Responsive Design** - Mobile-first approach
+- **Gradient Backgrounds** and modern styling
+- **Loading States** with skeleton screens
+- **Smooth Animations** and transitions
+- **Interactive Elements** with hover effects
+- **Professional Typography** and spacing
+- **Tailwind CSS** for consistent styling
 
-```bash
-ng generate --help
-```
+### 🖼️ **Image Management**
 
-## Building
+- **Unsplash Integration** for high-quality product images
+- **Smart Image Matching** based on product names
 
-To build the project run:
+## 🛠️ Technology Stack
 
-```bash
-ng build
-```
+### Frontend
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+- **Angular 17+** - Latest Angular framework
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **RxJS** - Reactive programming
+- **Angular Router** - Navigation management
+- **Reactive Forms** - Form handling and validation
 
-## Running unit tests
+### External APIs
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+- **Unsplash API** - High-quality product images
+- **RESTful API** architecture
 
-```bash
-ng test
-```
+## 🚀 Getting Started
 
-## Running end-to-end tests
+### Prerequisites
 
-For end-to-end (e2e) testing, run:
+- Node.js (v18+)
+- Angular CLI (v17+)
+- PostgreSQL or SQLite
+- Unsplash API Key (optional)
 
-```bash
-ng e2e
-```
+### Installation
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+#### 1. Clone the repository
 
-## Additional Resources
+git clone https://github.com/yourusername/tech-inventory
+cd tech-inventory
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+text
+
+#### 2. Install Frontend Dependencies
+
+cd tech-inventory-frontend
+
+npm install
