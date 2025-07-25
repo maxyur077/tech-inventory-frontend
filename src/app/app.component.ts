@@ -12,7 +12,7 @@ import { filter } from 'rxjs/operators';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  showHeader = false;
+  showHeader = true;
 
   private noHeaderRoutes = ['/auth/login', '/auth/register'];
 

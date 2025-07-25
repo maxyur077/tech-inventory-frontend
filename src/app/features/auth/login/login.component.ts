@@ -38,10 +38,13 @@ export class LoginComponent {
       this.isLoading = true;
       this.errorMessage = '';
 
-      // Use real API instead of demo
       this.authService.login(this.loginForm.value).subscribe({
         next: (response) => {
           if (response.success) {
+            console.log(
+              'Login successful, token stored:',
+              this.authService.getToken()
+            );
             this.router.navigate(['/dashboard']);
           } else {
             this.errorMessage =

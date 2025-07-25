@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Product, ApiResponse, PaginatedResponse } from '../models/interfaces';
+import { Observable, tap } from 'rxjs';
 
 export interface ProductFilters {
   page?: number;
@@ -12,6 +11,37 @@ export interface ProductFilters {
   maxPrice?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+}
+
+interface Product {
+  id?: number;
+  name: string;
+  price: number;
+  description?: string;
+  category?: string;
+  stock_quantity: number;
+  is_active?: boolean;
+}
+
+interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data?: T;
+}
+
+interface PaginatedResponse<T> {
+  success: boolean;
+  message: string;
+  data: {
+    products?: T[];
+    orders?: T[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      pages: number;
+    };
+  };
 }
 
 @Injectable({
@@ -34,15 +64,32 @@ export class ProductService {
       }
     });
 
+    console.log(
+      'ProductService - Getting products with token:',
+      localStorage.getItem('token')
+    );
     return this.http.get<PaginatedResponse<Product>>(this.apiUrl, { params });
   }
 
-  getProductById(id: number): Observable<ApiResponse<Product>> {
-    return this.http.get<ApiResponse<Product>>(`${this.apiUrl}/${id}`);
-  }
-
   createProduct(product: Partial<Product>): Observable<ApiResponse<Product>> {
-    return this.http.post<ApiResponse<Product>>(this.apiUrl, product);
+    console.log('ProductService - Creating product');
+    console.log(
+      'ProductService - Token before request:',
+      localStorage.getItem('token')
+    );
+    console.log('ProductService - Product data:', product);
+
+    return this.http.post<ApiResponse<Product>>(this.apiUrl, product).pipe(
+      tap({
+        next: (response) =>
+          console.log('ProductService - Create success:', response),
+        error: (error) => {
+          console.error('ProductService - Create error:', error);
+          console.error('ProductService - Error status:', error.status);
+          console.error('ProductService - Error headers:', error.headers);
+        },
+      })
+    );
   }
 
   updateProduct(
@@ -54,5 +101,9 @@ export class ProductService {
 
   deleteProduct(id: number): Observable<ApiResponse<any>> {
     return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/${id}`);
+  }
+
+  getProductById(id: number): Observable<ApiResponse<Product>> {
+    return this.http.get<ApiResponse<Product>>(`${this.apiUrl}/${id}`);
   }
 }

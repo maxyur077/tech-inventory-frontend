@@ -2,20 +2,33 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
-import {
-  ApiResponse,
-  User,
-  LoginRequest,
-  RegisterRequest,
-  AuthResponse,
-} from '../models/interfaces';
+
+interface LoginResponse {
+  success: boolean;
+  message: string;
+  data: {
+    token: string;
+    user: {
+      id: number;
+      username: string;
+      email: string;
+      role: string;
+    };
+  };
+}
+
+interface RegisterResponse {
+  success: boolean;
+  message: string;
+  data: any;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/api/v1';
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  private apiUrl = 'http://localhost:3000/api/v1/users';
+  private currentUserSubject = new BehaviorSubject<any>(null);
   private tokenSubject = new BehaviorSubject<string | null>(null);
 
   currentUser$ = this.currentUserSubject.asObservable();
@@ -29,74 +42,116 @@ export class AuthService {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
 
+    console.log(
+      'Loading stored auth - Token exists:',
+      !!token,
+      'User exists:',
+      !!user
+    );
+
     if (token && user) {
-      this.tokenSubject.next(token);
-      this.currentUserSubject.next(JSON.parse(user));
+      try {
+        const parsedUser = JSON.parse(user);
+        this.tokenSubject.next(token);
+        this.currentUserSubject.next(parsedUser);
+        console.log('Auth loaded successfully for user:', parsedUser.username);
+      } catch (error) {
+        console.error('Error parsing stored user data:', error);
+        this.clearStoredAuth();
+      }
     }
   }
 
-  login(credentials: LoginRequest): Observable<ApiResponse<AuthResponse>> {
+  private clearStoredAuth(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.tokenSubject.next(null);
+    this.currentUserSubject.next(null);
+  }
+
+  login(credentials: {
+    username: string;
+    password: string;
+  }): Observable<LoginResponse> {
     return this.http
-      .post<ApiResponse<AuthResponse>>(
-        `${this.apiUrl}/users/login`,
-        credentials
-      )
+      .post<LoginResponse>(`${this.apiUrl}/login`, credentials)
       .pipe(
         tap((response) => {
+          console.log('Login response:', response);
           if (response.success && response.data) {
-            this.setAuthData(response.data.token, response.data.user);
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+
+            this.tokenSubject.next(response.data.token);
+            this.currentUserSubject.next(response.data.user);
+
+            console.log(
+              'Token stored successfully:',
+              localStorage.getItem('token')
+            );
           }
         })
       );
   }
 
-  register(userData: RegisterRequest): Observable<ApiResponse<User>> {
-    return this.http.post<ApiResponse<User>>(
-      `${this.apiUrl}/users/register`,
+  register(userData: {
+    username: string;
+    email: string;
+    password: string;
+  }): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(
+      `${this.apiUrl}/register`,
       userData
     );
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.currentUserSubject.next(null);
-    this.tokenSubject.next(null);
+    console.log('Logging out user');
+    this.clearStoredAuth();
     this.router.navigate(['/auth/login']);
   }
 
-  private setAuthData(token: string, user: User): void {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    this.tokenSubject.next(token);
-    this.currentUserSubject.next(user);
-  }
-
   getToken(): string | null {
-    return this.tokenSubject.value;
+    const token = localStorage.getItem('token') || this.tokenSubject.value;
+    console.log('Getting token:', !!token);
+    return token;
   }
 
-  getCurrentUser(): User | null {
+  getCurrentUser(): any {
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        return null;
+      }
+    }
     return this.currentUserSubject.value;
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    const isAuth = !!token && !this.isTokenExpired(token);
+    console.log('Is authenticated:', isAuth);
+    return isAuth;
+  }
+
+  private isTokenExpired(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Math.floor(Date.now() / 1000);
+      const isExpired = payload.exp < currentTime;
+      console.log('Token expired:', isExpired);
+      return isExpired;
+    } catch (error) {
+      console.error('Error checking token expiration:', error);
+      return true;
+    }
   }
 
   isAdmin(): boolean {
     const user = this.getCurrentUser();
     return user?.role === 'admin';
-  }
-
-  getProfile(): Observable<ApiResponse<User>> {
-    return this.http.get<ApiResponse<User>>(`${this.apiUrl}/users/profile`);
-  }
-
-  updateProfile(userData: Partial<User>): Observable<ApiResponse<User>> {
-    return this.http.put<ApiResponse<User>>(
-      `${this.apiUrl}/users/profile`,
-      userData
-    );
   }
 }

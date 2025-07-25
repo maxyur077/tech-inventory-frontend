@@ -1,121 +1,147 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
-import { AuthService } from '../../core/services/auth.service';
-import { User } from '../../core/models/interfaces';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { Router } from '@angular/router';
 
-@Component({
-  selector: 'app-profile',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.css'],
+// Define the response interfaces
+interface LoginResponse {
+  success: boolean;
+  message: string;
+  data: {
+    token: string;
+    user: {
+      id: number;
+      username: string;
+      email: string;
+      role: string;
+    };
+  };
+}
+
+interface RegisterResponse {
+  success: boolean;
+  message: string;
+  data: any;
+}
+
+interface UpdateProfileResponse {
+  success: boolean;
+  message: string;
+  data: {
+    id: number;
+    username: string;
+    email: string;
+    role: string;
+  };
+}
+
+@Injectable({
+  providedIn: 'root',
 })
-export class ProfileComponent implements OnInit {
-  profileForm: FormGroup;
-  currentUser: User | null = null;
-  isLoading = false;
-  successMessage = '';
-  errorMessage = '';
+export class AuthService {
+  private apiUrl = 'http://localhost:3000/api/v1/users';
+  private currentUserSubject = new BehaviorSubject<any>(null);
+  private tokenSubject = new BehaviorSubject<string | null>(null);
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
-    this.profileForm = this.fb.group(
-      {
-        username: ['', [Validators.required, Validators.minLength(3)]],
-        email: ['', [Validators.required, Validators.email]],
-        password: [''],
-        confirmPassword: [''],
-      },
-      { validators: this.passwordMatchValidator }
+  currentUser$ = this.currentUserSubject.asObservable();
+  token$ = this.tokenSubject.asObservable();
+
+  constructor(private http: HttpClient, private router: Router) {
+    this.loadStoredAuth();
+  }
+
+  private loadStoredAuth(): void {
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+
+    if (token && user) {
+      this.tokenSubject.next(token);
+      this.currentUserSubject.next(JSON.parse(user));
+    }
+  }
+
+  login(credentials: {
+    username: string;
+    password: string;
+  }): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${this.apiUrl}/login`, credentials)
+      .pipe(
+        tap((response) => {
+          console.log('Login response:', response);
+          if (response.success && response.data) {
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+
+            this.tokenSubject.next(response.data.token);
+            this.currentUserSubject.next(response.data.user);
+
+            console.log(
+              'Token stored in localStorage:',
+              localStorage.getItem('token')
+            );
+          }
+        })
+      );
+  }
+
+  register(userData: {
+    username: string;
+    email: string;
+    password: string;
+  }): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(
+      `${this.apiUrl}/register`,
+      userData
     );
   }
 
-  ngOnInit(): void {
-    this.authService.currentUser$.subscribe((user) => {
-      this.currentUser = user;
-      if (user) {
-        this.profileForm.patchValue({
-          username: user.username,
-          email: user.email,
-          password: '',
-          confirmPassword: '',
-        });
-      }
-    });
-  }
-
-  private passwordMatchValidator(form: FormGroup) {
-    const password = form.get('password');
-    const confirmPassword = form.get('confirmPassword');
-
-    if (
-      password?.value &&
-      confirmPassword?.value &&
-      password.value !== confirmPassword.value
-    ) {
-      return { passwordMismatch: true };
-    }
-    return null;
-  }
-
-  getUserInitials(): string {
-    if (!this.currentUser?.username) return 'U';
-    return this.currentUser.username.substring(0, 2).toUpperCase();
-  }
-
-  onSubmit(): void {
-    if (this.profileForm.valid) {
-      this.isLoading = true;
-      this.errorMessage = '';
-      this.successMessage = '';
-
-      const formData = { ...this.profileForm.value };
-
-      // Remove confirmPassword and empty password
-      delete formData.confirmPassword;
-      if (!formData.password) {
-        delete formData.password;
-      }
-
-      this.authService.updateProfile(formData).subscribe({
-        next: (response) => {
+  // Add the missing updateProfile method
+  updateProfile(profileData: {
+    username?: string;
+    email?: string;
+    password?: string;
+  }): Observable<UpdateProfileResponse> {
+    return this.http
+      .put<UpdateProfileResponse>(`${this.apiUrl}/profile`, profileData)
+      .pipe(
+        tap((response) => {
           if (response.success && response.data) {
-            // Update local user data
+            // Update stored user data
             localStorage.setItem('user', JSON.stringify(response.data));
-            this.successMessage = 'Profile updated successfully!';
-            this.profileForm.patchValue({ password: '', confirmPassword: '' });
-
-            setTimeout(() => {
-              this.successMessage = '';
-            }, 5000);
+            this.currentUserSubject.next(response.data);
+            console.log('Profile updated and user data refreshed');
           }
-        },
-        error: (error) => {
-          this.errorMessage =
-            error.error?.message || 'Failed to update profile';
-        },
-        complete: () => {
-          this.isLoading = false;
-        },
-      });
-    }
+        })
+      );
   }
 
-  resetForm(): void {
-    if (this.currentUser) {
-      this.profileForm.patchValue({
-        username: this.currentUser.username,
-        email: this.currentUser.email,
-        password: '',
-        confirmPassword: '',
-      });
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.currentUserSubject.next(null);
+    this.tokenSubject.next(null);
+    this.router.navigate(['/auth/login']);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token') || this.tokenSubject.value;
+  }
+
+  getCurrentUser(): any {
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      return JSON.parse(stored);
     }
-    this.errorMessage = '';
-    this.successMessage = '';
+    return this.currentUserSubject.value;
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
+
+  isAdmin(): boolean {
+    const user = this.getCurrentUser();
+    return user?.role === 'admin';
   }
 }

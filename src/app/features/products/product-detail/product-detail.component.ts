@@ -1,56 +1,79 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
-import { OrderService } from '../../../core/services/order.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Product } from '../../../core/models/interfaces';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.css'],
 })
 export class ProductDetailComponent implements OnInit {
   product: Product | null = null;
-  isLoading = false;
-  isAddingToCart = false;
+  isLoading = true;
   isAdmin = false;
-  successMessage = '';
+  isAddingToCart = false; // ✅ Add this property
   errorMessage = '';
+  successMessage = '';
+  quantity = 1;
 
   constructor(
-    private productService: ProductService,
-    private orderService: OrderService,
-    private authService: AuthService,
+    private route: ActivatedRoute,
     private router: Router,
-    private route: ActivatedRoute
+    private productService: ProductService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe((user) => {
-      this.isAdmin = user?.role === 'admin';
-    });
+    // Check authentication first
+    if (!this.authService.isAuthenticated()) {
+      console.log('User not authenticated, redirecting to login');
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    // Check admin status
+    const currentUser = this.authService.getCurrentUser();
+    this.isAdmin = currentUser?.role === 'admin';
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadProduct(+id);
+    } else {
+      this.router.navigate(['/products']);
     }
   }
 
   private loadProduct(id: number): void {
     this.isLoading = true;
+    this.errorMessage = '';
+
     this.productService.getProductById(id).subscribe({
       next: (response) => {
+        console.log('Product API response:', response);
         if (response.success && response.data) {
-          this.product = response.data;
+          this.product = {
+            ...response.data,
+            id: response.data.id || 0,
+            is_active: response.data.is_active ?? true,
+          };
+        } else {
+          this.errorMessage = 'Product not found';
         }
       },
       error: (error) => {
-        this.errorMessage = 'Failed to load product';
         console.error('Failed to load product:', error);
+        if (error.status === 401) {
+          console.log('Unauthorized access, redirecting to login');
+          this.authService.logout(); // Clear any invalid tokens
+          this.router.navigate(['/auth/login']);
+        } else {
+          this.errorMessage = 'Failed to load product details';
+        }
       },
       complete: () => {
         this.isLoading = false;
@@ -58,45 +81,56 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
+  // ✅ Add the missing addToCart method
   addToCart(): void {
-    if (!this.product) return;
+    if (!this.product || this.product.stock_quantity === 0) {
+      this.errorMessage = 'Product is out of stock';
+      return;
+    }
 
     this.isAddingToCart = true;
     this.errorMessage = '';
     this.successMessage = '';
 
-    const orderData = {
-      product_ids: [this.product.id],
-      total_amount: this.product.price,
-    };
+    // Simulate adding to cart (replace with actual cart service call)
+    setTimeout(() => {
+      this.isAddingToCart = false;
+      this.successMessage = `${
+        this.product!.name
+      } has been added to your cart!`;
 
-    this.orderService.createOrder(orderData).subscribe({
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        this.successMessage = '';
+      }, 3000);
+    }, 1000);
+
+    // If you have an actual cart service, use this instead:
+    /*
+    this.cartService.addToCart(this.product, this.quantity).subscribe({
       next: (response) => {
-        if (response.success) {
-          this.successMessage = 'Product added to cart successfully!';
-          setTimeout(() => {
-            this.successMessage = '';
-          }, 3000);
-        }
+        this.isAddingToCart = false;
+        this.successMessage = `${this.product!.name} has been added to your cart!`;
       },
       error: (error) => {
-        this.errorMessage =
-          error.error?.message || 'Failed to add product to cart';
-      },
-      complete: () => {
         this.isAddingToCart = false;
-      },
+        this.errorMessage = 'Failed to add product to cart';
+      }
     });
+    */
   }
 
   editProduct(): void {
-    if (this.product) {
+    if (this.product?.id) {
       this.router.navigate(['/products/edit', this.product.id]);
     }
   }
 
   deleteProduct(): void {
-    if (!this.product) return;
+    if (!this.product?.id) {
+      this.errorMessage = 'Invalid product ID';
+      return;
+    }
 
     if (confirm(`Are you sure you want to delete "${this.product.name}"?`)) {
       this.productService.deleteProduct(this.product.id).subscribe({
@@ -106,8 +140,8 @@ export class ProductDetailComponent implements OnInit {
           }
         },
         error: (error) => {
-          this.errorMessage = 'Failed to delete product';
           console.error('Failed to delete product:', error);
+          this.errorMessage = 'Failed to delete product';
         },
       });
     }
@@ -115,5 +149,17 @@ export class ProductDetailComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/products']);
+  }
+
+  increaseQuantity(): void {
+    if (this.product && this.quantity < this.product.stock_quantity) {
+      this.quantity++;
+    }
+  }
+
+  decreaseQuantity(): void {
+    if (this.quantity > 1) {
+      this.quantity--;
+    }
   }
 }

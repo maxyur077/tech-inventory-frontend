@@ -1,43 +1,60 @@
 .product-card {
-  transition: all 0.3s ease;
+  @apply bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105;
 }
 
-.product-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+.action-btn {
+  @apply p-2 text-white rounded-full transition-all duration-200 transform hover:scale-110 shadow-lg;
 }
 
 .line-clamp-2 {
-  overflow: hidden;
   display: -webkit-box;
-  -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
+/* Custom animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-card {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Responsive grid improvements */
+@media (max-width: 640px) {
+  .product-card {
+    @apply mx-2;
+  }
+}
+
+/* Image loading state */
+.product-card img {
+  @apply transition-all duration-300;
+}
+
+.product-card:hover img {
+  @apply brightness-110;
+}
+
+/* Filter section enhancements */
 .filter-section {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  @apply backdrop-blur-sm;
 }
 
-.pagination-btn {
-  transition: all 0.2s ease;
+/* Pagination styles */
+nav button {
+  @apply shadow-sm;
 }
 
-.pagination-btn:hover:not(:disabled) {
-  background-color: #f3f4f6;
-  transform: translateY(-1px);
-}
-
-.empty-state-icon {
-  color: #9ca3af;
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+nav button:hover {
+  @apply shadow-md transform scale-105;
 }
