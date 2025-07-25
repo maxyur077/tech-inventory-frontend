@@ -74,7 +74,6 @@ https://github.com/user-attachments/assets/0d6a27b4-756d-433b-bba3-c095f83c1d63
 #### 1. Clone the repository
 
 git clone https://github.com/yourusername/tech-inventory
-cd tech-inventory
 
 
 #### 2. Install Frontend Dependencies
@@ -82,3 +81,7 @@ cd tech-inventory
 cd tech-inventory-frontend
 
 npm install
+
+#### 3. Run 
+ng serve
+
