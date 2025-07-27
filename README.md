@@ -2,7 +2,13 @@
 
 A modern, full-featured inventory management system built with Angular 17+ and Node.js, designed specifically for tech products with beautiful UI and comprehensive functionality.
 
-![Tech Inventory](https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=400&fit=crop&auto=format)
+
+https://github.com/user-attachments/assets/0d6a27b4-756d-433b-bba3-c095f83c1d63
+
+
+
+
+
 
 ## 🚀 Features Overview
 
@@ -61,20 +67,21 @@ A modern, full-featured inventory management system built with Angular 17+ and N
 
 - Node.js (v18+)
 - Angular CLI (v17+)
-- PostgreSQL or SQLite
-- Unsplash API Key (optional)
+-  SQL
 
 ### Installation
 
 #### 1. Clone the repository
 
 git clone https://github.com/yourusername/tech-inventory
-cd tech-inventory
 
-text
 
 #### 2. Install Frontend Dependencies
 
 cd tech-inventory-frontend
 
 npm install
+
+#### 3. Run 
+ng serve
+
