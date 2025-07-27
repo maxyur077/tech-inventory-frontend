@@ -24,6 +24,10 @@ export class RegisterComponent {
   showPassword = false;
   showConfirmPassword = false;
 
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -34,7 +38,6 @@ export class RegisterComponent {
         username: ['', [Validators.required, Validators.minLength(3)]],
         email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', [Validators.required]],
       },
       { validators: this.passwordMatchValidator }
     );
@@ -60,14 +63,12 @@ export class RegisterComponent {
       this.errorMessage = '';
       this.successMessage = '';
 
-      // Prepare data for API (exclude confirmPassword)
       const registerData = {
         username: this.registerForm.value.username,
         email: this.registerForm.value.email,
         password: this.registerForm.value.password,
       };
 
-      // Use real API instead of demo
       this.authService.register(registerData).subscribe({
         next: (response) => {
           if (response.success) {

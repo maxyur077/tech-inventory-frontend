@@ -46,29 +46,17 @@ export class ProductFormComponent implements OnInit {
   ngOnInit(): void {
     console.log('ProductForm - ngOnInit called');
 
-    // 🔧 Check authentication first
     if (!this.authService.isAuthenticated()) {
       console.log('ProductForm - User not authenticated, redirecting to login');
       this.router.navigate(['/auth/login']);
       return;
     }
 
-    // 🔧 Check if user is admin (for creating/editing products)
     const currentUser = this.authService.getCurrentUser();
     this.isAdmin = currentUser?.role === 'admin';
 
     console.log('ProductForm - Current user:', currentUser);
     console.log('ProductForm - Is admin:', this.isAdmin);
-
-    // For now, allow all authenticated users to create/edit products
-    // If you want only admins to create/edit products, uncomment below:
-    /*
-    if (!this.isAdmin) {
-      console.log('ProductForm - User is not admin, redirecting to products');
-      this.router.navigate(['/products']);
-      return;
-    }
-    */
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -112,7 +100,6 @@ export class ProductFormComponent implements OnInit {
 
   onSubmit(): void {
     if (this.productForm.valid) {
-      // 🔧 Double-check authentication before submitting
       if (!this.authService.isAuthenticated()) {
         console.log('ProductForm - User not authenticated during submit');
         this.router.navigate(['/auth/login']);
@@ -176,6 +163,6 @@ export class ProductFormComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/products']); // Changed from /dashboard to /products
+    this.router.navigate(['/products']);
   }
 }

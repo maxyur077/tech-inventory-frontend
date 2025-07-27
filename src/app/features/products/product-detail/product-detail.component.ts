@@ -16,7 +16,7 @@ export class ProductDetailComponent implements OnInit {
   product: Product | null = null;
   isLoading = true;
   isAdmin = false;
-  isAddingToCart = false; // ✅ Add this property
+  isAddingToCart = false;
   errorMessage = '';
   successMessage = '';
   quantity = 1;
@@ -29,14 +29,12 @@ export class ProductDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Check authentication first
     if (!this.authService.isAuthenticated()) {
       console.log('User not authenticated, redirecting to login');
       this.router.navigate(['/auth/login']);
       return;
     }
 
-    // Check admin status
     const currentUser = this.authService.getCurrentUser();
     this.isAdmin = currentUser?.role === 'admin';
 
@@ -69,7 +67,7 @@ export class ProductDetailComponent implements OnInit {
         console.error('Failed to load product:', error);
         if (error.status === 401) {
           console.log('Unauthorized access, redirecting to login');
-          this.authService.logout(); // Clear any invalid tokens
+          this.authService.logout();
           this.router.navigate(['/auth/login']);
         } else {
           this.errorMessage = 'Failed to load product details';
@@ -81,7 +79,6 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
-  // ✅ Add the missing addToCart method
   addToCart(): void {
     if (!this.product || this.product.stock_quantity === 0) {
       this.errorMessage = 'Product is out of stock';
@@ -92,32 +89,16 @@ export class ProductDetailComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    // Simulate adding to cart (replace with actual cart service call)
     setTimeout(() => {
       this.isAddingToCart = false;
       this.successMessage = `${
         this.product!.name
       } has been added to your cart!`;
 
-      // Clear success message after 3 seconds
       setTimeout(() => {
         this.successMessage = '';
       }, 3000);
     }, 1000);
-
-    // If you have an actual cart service, use this instead:
-    /*
-    this.cartService.addToCart(this.product, this.quantity).subscribe({
-      next: (response) => {
-        this.isAddingToCart = false;
-        this.successMessage = `${this.product!.name} has been added to your cart!`;
-      },
-      error: (error) => {
-        this.isAddingToCart = false;
-        this.errorMessage = 'Failed to add product to cart';
-      }
-    });
-    */
   }
 
   editProduct(): void {

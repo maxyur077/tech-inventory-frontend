@@ -85,7 +85,6 @@ export class OrderListComponent implements OnInit {
   }
 
   updateOrderStatus(order: Order): void {
-    // Navigate to order detail for status update
     this.router.navigate(['/orders', order.id]);
   }
 
@@ -104,5 +103,5 @@ export class OrderListComponent implements OnInit {
     }
   }
 
-  Math = Math; // Make Math available in template
+  Math = Math;
 }
