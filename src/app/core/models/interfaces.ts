@@ -71,3 +71,64 @@ export interface AuthResponse {
   user: User;
   token: string;
 }
+export interface ProductFilters {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data?: T;
+}
+
+export interface PaginatedResponse<T> {
+  success: boolean;
+  message: string;
+  data: {
+    products?: T[];
+    orders?: T[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      pages: number;
+    };
+  };
+}
+export interface OrderFilters {
+  page?: number;
+  limit?: number;
+  status?: string;
+  user_id?: number;
+}
+
+export interface CreateOrderRequest {
+  product_ids: number[];
+  total_amount: number;
+}
+export interface LoginResponse {
+  success: boolean;
+  message: string;
+  data: {
+    token: string;
+    user: {
+      id: number;
+      username: string;
+      email: string;
+      role: string;
+    };
+  };
+}
+
+export interface RegisterResponse {
+  success: boolean;
+  message: string;
+  data: any;
+}

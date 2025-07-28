@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import {
-  ProductService,
-  ProductFilters,
-} from '../../../core/services/product.service';
+import { ProductService } from '../../../core/services/product.service';
 import { UnsplashService } from '../../../core/services/unsplash.service';
-import { Product } from '../../../core/models/interfaces';
+import {
+  Product,
+  ProductFilters,
+  ApiResponse,
+} from '../../../core/models/interfaces';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({

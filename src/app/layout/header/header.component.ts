@@ -2,13 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  role: string;
-}
+import { User } from '../../core/models/interfaces';
 
 @Component({
   selector: 'app-header',
@@ -32,7 +26,7 @@ export class HeaderComponent implements OnInit {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
-        this.isVisible = this.hiddenRoutes.includes(event.url);
+        this.isVisible = !this.hiddenRoutes.includes(event.url);
 
         this.loadCurrentUser();
       });

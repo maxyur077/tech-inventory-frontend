@@ -2,11 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import {
-  OrderService,
-  OrderFilters,
-} from '../../../core/services/order.service';
-import { Order } from '../../../core/models/interfaces';
+import { OrderService } from '../../../core/services/order.service';
+import { Order, OrderFilters } from '../../../core/models/interfaces';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({

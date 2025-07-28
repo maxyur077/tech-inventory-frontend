@@ -2,32 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
-
-interface LoginResponse {
-  success: boolean;
-  message: string;
-  data: {
-    token: string;
-    user: {
-      id: number;
-      username: string;
-      email: string;
-      role: string;
-    };
-  };
-}
-
-interface RegisterResponse {
-  success: boolean;
-  message: string;
-  data: any;
-}
+import { environment } from '../../../environments/environment';
+import { LoginResponse, RegisterResponse } from '../models/interfaces';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/api/v1/users';
+  private readonly apiUrl = `${environment.apiUrl}/users`;
   private currentUserSubject = new BehaviorSubject<any>(null);
   private tokenSubject = new BehaviorSubject<string | null>(null);
 

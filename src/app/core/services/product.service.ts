@@ -1,17 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-
-export interface ProductFilters {
-  page?: number;
-  limit?: number;
-  search?: string;
-  category?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}
+import {
+  ApiResponse,
+  PaginatedResponse,
+  ProductFilters,
+} from '../models/interfaces';
+import { environment } from '../../../environments/environment';
 
 interface Product {
   id?: number;
@@ -23,32 +18,11 @@ interface Product {
   is_active?: boolean;
 }
 
-interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data?: T;
-}
-
-interface PaginatedResponse<T> {
-  success: boolean;
-  message: string;
-  data: {
-    products?: T[];
-    orders?: T[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      pages: number;
-    };
-  };
-}
-
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  private apiUrl = 'http://localhost:3000/api/v1/products';
+  private readonly apiUrl = `${environment.apiUrl}/products`;
 
   constructor(private http: HttpClient) {}
 

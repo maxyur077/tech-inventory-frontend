@@ -10,7 +10,7 @@
 /node_modules
 npm-debug.log
 yarn-error.log
-
+/environments
 # IDEs and editors
 .idea/
 .project
@@ -27,6 +27,13 @@ yarn-error.log
 !.vscode/launch.json
 !.vscode/extensions.json
 .history/*
+
+
+src/environments/environment.ts
+src/environments/environment.uat.ts
+src/environments/*.local.ts
+src/environments/*.secret.ts
+src/environments/environment.prod.ts
 
 # Miscellaneous
 /.angular/cache
